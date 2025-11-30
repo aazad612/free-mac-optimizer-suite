@@ -29,6 +29,20 @@ Everything is packaged inside a single macOS app for easy use.
 6. Now go to security and privacy in settings and it should give you the "open anyway" option at the bottom. 
 7. Provide password when prompted and ask for confirmation. 
 8. Close the window once it says "Process Completed", I tested it on 3 machines but if there are errors please let me know. 
+9. Please like the video, subscribe to the channel and support so I can build more, next on the list is to build a mac disk cleanup app. 
+
+---
+
+## ❤️ Support the Project  
+If this helped your old Mac run smoother, please consider donating **$1**:
+
+<p align="left">
+<a href="https://venmo.com/u/johney612">
+ <img src="https://img.shields.io/badge/Donate%20a%20Dollar-red?style=for-the-badge&logo=venmo&logoColor=white&labelColor=000000&color=ff3344" width="200" height="200">
+</a>
+</p>
+
+Your contribution helps keep this project alive.
 
 ---
 
@@ -47,16 +61,6 @@ The suite is fully modular and open-source.
 
 ---
 
-## ❤️ Support the Project  
-If this helped your old Mac run smoother, please consider donating **$1**:
-
-<p align="left">
-<a href="https://venmo.com/u/johney612">
- <img src="https://img.shields.io/badge/Donate%20a%20Dollar-red?style=for-the-badge&logo=venmo&logoColor=white&labelColor=000000&color=ff3344" width="200" height="200">
-</a>
-</p>
-
-Your contribution helps keep this project alive.
 
 ---
 
