@@ -3,10 +3,10 @@
 
 <p align="center">
 
-  <!-- Download Button -->
-  <a href="./mac-optimizer.app">
-    <img src="https://img.shields.io/badge/⬇️%20Download%20App-macOS%20Optimizer-blue?style=for-the-badge" />
+  <a href="./mac-optimizer.zip">
+     <img src="https://img.shields.io/badge/⬇️ Download App-macOS Optimizer-blue?style=for-the-badge" />
   </a>
+
 
   <!-- Donate Button -->
   <a href="https://venmo.com/u/johney612">
