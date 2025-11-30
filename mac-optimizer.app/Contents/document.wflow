@@ -59,15 +59,21 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>#!/usr/bin/env bash
-set -euo pipefail
+					<string>#!/bin/bash
+set -e
 
-# Go to your optimizer folder
-cd "$HOME/free-mac-optimizer-suite"
+TARGET="$HOME/free-mac-optimizer-suite"
+BASE="https://raw.githubusercontent.com/aazad612/free-mac-optimizer-suite/main"
 
-# Open Terminal and run the command file there
-# Terminal will execute run_all.command in an interactive shell.
-open -a Terminal "./run_all.command"
+mkdir -p "$TARGET"
+cd "$TARGET"
+
+# Download ONLY run_all.command
+curl -sSL -o run_all.command "$BASE/run_all.command"
+chmod +x run_all.command
+
+# Run it in Terminal (run_all will handle sudo + downloading others)
+open -a Terminal "$TARGET/run_all.command"
 </string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
