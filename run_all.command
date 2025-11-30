@@ -42,4 +42,5 @@ echo "▶ 3/3 – iCloud optimization..."
 echo
 echo "✅ Finished. You can close this window."
 read -r -p "Press Enter to close..."
+exit
 
