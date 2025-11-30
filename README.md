@@ -52,7 +52,7 @@ Your contribution helps keep this project alive.
 All components are included in this repository.  
 If you know scripting, feel free to:
 
-- Read the logic  
+- Read the logic from reference.md
 - Modify modules  
 - Add your own performance tweaks  
 - Replace or customize behaviors  
@@ -61,8 +61,6 @@ The suite is fully modular and open-source.
 
 ---
 
-
----
 
 ## 🛠 Open Source  
 This project is fully open, free to use, and maintained for the community.  
