@@ -8,10 +8,6 @@
     <img src="https://img.shields.io/badge/Click%20to%20Download%20App-blue?style=for-the-badge&logo=apple&logoColor=white&labelColor=000000&color=1e90ff" width="200" height="200">
   </a>
 
-  <!-- Donate Button -->
-  <a href="https://venmo.com/u/johney612">
-    <img src="https://img.shields.io/badge/Donate%20a%20Dollar-red?style=for-the-badge&logo=venmo&logoColor=white&labelColor=000000&color=ff3344" width="200" height="200">
-  </a>
 
 </p>
 
