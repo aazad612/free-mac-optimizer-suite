@@ -16,6 +16,17 @@ echo
 echo "Press Enter to continue, or Ctrl+C to cancel."
 read -r _
 
+# Request sudo if not root
+if [[ $EUID -ne 0 ]]; then
+    echo "Administrator password required..."
+    sudo "$0" "$@"
+    exit $?
+fi
+
+# Continue normally here (root from this point)
+echo "Running with elevated permissions..."
+
+
 echo
 echo "▶ 1/3 – Siri optimization..."
 "${SCRIPT_DIR}/siri.sh" -disable || echo "⚠ Siri script failed."

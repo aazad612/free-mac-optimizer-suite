@@ -5,6 +5,7 @@
 # Spotlight / Search noise controller for macOS:
 #   - Controls Spotlight indexing (mds, mdworker, etc.)
 #   - Disables/enables Spotlight Suggestions & Safari search suggestions.
+#   - More aggressive: unloads Spotlight launchd jobs and killalls daemons.
 #
 # Modes:
 #   ./spotlight.sh           → interactive prompt
@@ -67,7 +68,6 @@ show_status() {
 
   echo
   say "[INFO] Spotlight Suggestions (system-wide):"
-  # When SuggestionsDisabled = 1 → suggestions OFF
   sugg=$(read_pref com.apple.Spotlight SuggestionsDisabled)
   echo
   say "  Spotlight suggestions disabled: $(yes_no_bool "$sugg")"
@@ -86,42 +86,91 @@ show_status() {
 }
 
 ###############################################################################
-# DISABLE: Stop indexing & online suggestions
+# DISABLE: Stop indexing & online suggestions, unload & kill daemons
 ###############################################################################
 
 disable_spotlight() {
   hr
-  say "[ACTION] DISABLING Spotlight indexing and online search suggestions"
+  say "[ACTION] DISABLING Spotlight indexing and online search suggestions (AGGRESSIVE)"
   hr
 
   say "[STEP] Turning OFF indexing for / (root volume)"
   cmd "mdutil -i off /"
 
-  # You could add other volumes here if you want:
-  # cmd "mdutil -i off /Volumes/Data"
-
   echo
-  say "[STEP] Disabling Spotlight Suggestions"
-  # 1 = disabled
+  say "[STEP] Disabling Spotlight Suggestions (system)"
   cmd "defaults write com.apple.Spotlight SuggestionsDisabled -bool true"
 
   echo
   say "[STEP] Hardening Safari search (no online suggestions)"
-  # Safari: don't send typed queries to Apple
   cmd "defaults write com.apple.Safari UniversalSearchEnabled -bool false"
   cmd "defaults write com.apple.Safari SuppressSearchSuggestions -bool true"
 
+  echo
   hr
-  say "[STEP] Showing Spotlight status AFTER disable"
+  say "[STEP] Unloading Spotlight / metadata launchd jobs (best-effort)"
+  hr
+
+  # These plist names may vary slightly by macOS version. If a file doesn't exist,
+  # you'll see the error – we are not hiding anything.
+  SPOTLIGHT_DAEMONS=(
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.plist"
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.scan.plist"
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.spindump.plist"
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.index.plist"
+  )
+
+  SPOTLIGHT_AGENTS=(
+    "/System/Library/LaunchAgents/com.apple.Spotlight.plist"
+    "/System/Library/LaunchAgents/com.apple.corespotlightd.plist"
+  )
+
+  say "[INFO] LaunchDaemons:"
+  for d in "${SPOTLIGHT_DAEMONS[@]}"; do
+    if [[ -f "$d" ]]; then
+      say "[UNLOAD] $d"
+      cmd "sudo launchctl unload -w '$d'"
+    else
+      say "[SKIP] Not found: $d"
+    fi
+  done
+
+  echo
+  say "[INFO] LaunchAgents (current user GUI):"
+  for a in "${SPOTLIGHT_AGENTS[@]}"; do
+    if [[ -f "$a" ]]; then
+      say "[UNLOAD] $a"
+      cmd "launchctl unload -w '$a'"
+    else
+      say "[SKIP] Not found: $a"
+    fi
+  done
+
+  echo
+  hr
+  say "[STEP] Killing Spotlight / metadata daemons"
+  hr
+
+  for p in mds mds_stores mds_scan mds_spindump mds_index mdworker mdworker_shared mdwrite \
+           corespotlightd spotlightknowledged suggestd Spotlight; do
+    say "[KILL] $p"
+    cmd "pgrep $p"
+    cmd "killall $p"
+  done
+
+  hr
+  say "[STEP] Spotlight status AFTER disable:"
   hr
   cmd "mdutil -s /"
   cmd "ps axo pid,comm | grep -Ei 'mds|mdworker|mdwrite|spotlight|corespotlight|suggest' | grep -v grep"
 
-  say "[COMPLETE] Spotlight indexing + online suggestions disabled (Safari + system)."
+  say "[NOTE] Some system processes may respawn because macOS really wants Spotlight alive."
+  say "      But indexing is OFF and suggestions are OFF; CPU/network impact should be much lower."
+  say "[COMPLETE] Spotlight indexing + online suggestions disabled as aggressively as we can."
 }
 
 ###############################################################################
-# ENABLE: Restore indexing & suggestions
+# ENABLE: Restore indexing & suggestions, reload daemons
 ###############################################################################
 
 enable_spotlight() {
@@ -134,7 +183,6 @@ enable_spotlight() {
 
   echo
   say "[STEP] Enabling Spotlight Suggestions (system)"
-  # 0 = enabled
   cmd "defaults write com.apple.Spotlight SuggestionsDisabled -bool false"
 
   echo
@@ -142,13 +190,51 @@ enable_spotlight() {
   cmd "defaults write com.apple.Safari UniversalSearchEnabled -bool true"
   cmd "defaults write com.apple.Safari SuppressSearchSuggestions -bool false"
 
+  echo
   hr
-  say "[STEP] Showing Spotlight status AFTER enable"
+  say "[STEP] Reloading Spotlight / metadata launchd jobs (best-effort)"
+  hr
+
+  SPOTLIGHT_DAEMONS=(
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.plist"
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.scan.plist"
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.spindump.plist"
+    "/System/Library/LaunchDaemons/com.apple.metadata.mds.index.plist"
+  )
+
+  SPOTLIGHT_AGENTS=(
+    "/System/Library/LaunchAgents/com.apple.Spotlight.plist"
+    "/System/Library/LaunchAgents/com.apple.corespotlightd.plist"
+  )
+
+  say "[INFO] LaunchDaemons:"
+  for d in "${SPOTLIGHT_DAEMONS[@]}"; do
+    if [[ -f "$d" ]]; then
+      say "[LOAD] $d"
+      cmd "sudo launchctl load -w '$d'"
+    else
+      say "[SKIP] Not found: $d"
+    fi
+  done
+
+  echo
+  say "[INFO] LaunchAgents (current user GUI):"
+  for a in "${SPOTLIGHT_AGENTS[@]}"; do
+    if [[ -f "$a" ]]; then
+      say "[LOAD] $a"
+      cmd "launchctl load -w '$a'"
+    else
+      say "[SKIP] Not found: $a"
+    fi
+  done
+
+  hr
+  say "[STEP] Spotlight status AFTER enable:"
   hr
   cmd "mdutil -s /"
   cmd "ps axo pid,comm | grep -Ei 'mds|mdworker|mdwrite|spotlight|corespotlight|suggest' | grep -v grep"
 
-  say "[COMPLETE] Spotlight indexing + online suggestions enabled."
+  say "[COMPLETE] Spotlight indexing + online suggestions enabled (or as close as macOS allows)."
 }
 
 ###############################################################################
@@ -157,13 +243,13 @@ enable_spotlight() {
 
 clear
 say "============================================================"
-say "   Spotlight / Search Noise Controller (Verbose, Flags)"
+say "   Spotlight / Search Noise Controller (Verbose, Aggressive)"
 say "============================================================"
 say
 
 # Flag mode
 if [[ "$1" == "-disable" ]]; then
-  say "[MODE] Immediate disable (no prompt)"
+  say "[MODE] Immediate DISABLE (no prompt)"
   disable_spotlight
   hr
   say "FINAL STATUS"
@@ -172,7 +258,7 @@ if [[ "$1" == "-disable" ]]; then
 fi
 
 if [[ "$1" == "-enable" ]]; then
-  say "[MODE] Immediate enable (no prompt)"
+  say "[MODE] Immediate ENABLE (no prompt)"
   enable_spotlight
   hr
   say "FINAL STATUS"
@@ -183,7 +269,7 @@ fi
 # Interactive mode
 show_status
 
-if prompt_yes_no "Disable Spotlight indexing and online search suggestions (system + Safari)?" ; then
+if prompt_yes_no "Disable Spotlight indexing and online search suggestions (and unload/kill daemons)?" ; then
   disable_spotlight
 else
   enable_spotlight
